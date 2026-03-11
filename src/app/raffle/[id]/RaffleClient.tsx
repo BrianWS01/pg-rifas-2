@@ -3,7 +3,7 @@
 import { useState } from "react";
 import CheckoutModal from "@/components/CheckoutModal";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ShoppingCart } from "lucide-react";
 
 interface Ticket {
   id: string;
@@ -25,7 +25,6 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleTicket = (number: number) => {
-    // Only allow selecting available tickets
     const ticket = raffle.tickets.find(t => t.number === number);
     if (ticket?.status !== 'AVAILABLE') return;
 
@@ -37,31 +36,30 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
   };
 
   return (
-    <main className="min-h-screen pt-8 pb-32 px-4 max-w-4xl mx-auto">
-      <Link href="/" className="inline-flex items-center text-primary hover:text-white transition-colors mb-8 text-sm font-semibold tracking-wider uppercase">
+    <main className="min-h-screen pt-8 pb-40 px-4 max-w-7xl mx-auto">
+      <Link href="/" className="inline-flex items-center text-gray-400 hover:text-white transition-colors mb-8 text-sm font-bold tracking-wider uppercase">
         <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
       </Link>
       
-      <header className="mb-12">
-        <div className="glass p-6 md:p-10 rounded-3xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
-          <h1 className="text-3xl md:text-5xl font-black mb-4 uppercase">{raffle.title}</h1>
-          <p className="text-gray-400 leading-relaxed max-w-2xl text-lg">
-            {raffle.description || "Adquira já a sua cota e concorra a este prêmio exclusivo."}
-          </p>
-          <div className="mt-8 inline-block bg-primary/10 border border-primary/20 text-primary px-6 py-2 rounded-full font-bold text-lg">
-            R$ {raffle.price.toFixed(2)} / cota
-          </div>
+      <header className="mb-16 text-center">
+        <h1 className="font-heading text-4xl md:text-6xl text-white uppercase tracking-tight mb-4">
+          Escolha Suas <span className="text-brand">Cotas</span>
+        </h1>
+        <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-8">
+          Selecione seus números da sorte abaixo. Quanto mais cotas você comprar, maiores as suas chances de levar o prêmio principal.
+        </p>
+        <div className="inline-block border-2 border-accent bg-accent/10 text-accent font-heading px-8 py-3 rounded-md text-xl md:text-2xl uppercase tracking-widest shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+          Valor da cota: R$ {raffle.price.toFixed(2)}
         </div>
       </header>
 
-      <section>
+      <section className="mb-20">
         <div className="flex justify-between items-end mb-6">
-           <h2 className="text-2xl font-bold">Escolha seus números</h2>
-           <span className="text-gray-500 text-sm">{selectedTickets.length} selecionado(s)</span>
+           <h2 className="text-xl text-gray-400 uppercase tracking-widest font-bold">Números Disponíveis</h2>
+           <span className="text-brand font-bold">{selectedTickets.length} selecionado(s)</span>
         </div>
         
-        <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-3">
+        <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-14 gap-2 md:gap-3">
           {raffle.tickets.map((ticket) => {
             const isSelected = selectedTickets.includes(ticket.number);
             const isReserved = ticket.status === 'RESERVED';
@@ -74,34 +72,67 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
                 disabled={!isAvailable}
                 onClick={() => toggleTicket(ticket.number)}
                 className={`
-                  aspect-square rounded-xl font-bold text-sm sm:text-base transition-all duration-200 flex items-center justify-center
-                  ${isSelected ? 'bg-primary text-black scale-105 shadow-[0_0_15px_rgba(255,215,0,0.5)]' : 
-                    isPaid ? 'bg-accent/20 text-accent border border-accent/30 cursor-not-allowed opacity-50' :
-                    isReserved ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 cursor-not-allowed opacity-50' :
-                    'bg-secondary text-gray-300 hover:bg-white/10 border border-white/5'}
+                  relative aspect-square rounded-md font-bold text-sm md:text-base transition-all duration-300 flex items-center justify-center overflow-hidden
+                  ${isSelected ? 'bg-brand text-white scale-110 shadow-[0_0_20px_rgba(212,0,0,0.6)] z-10 border-brand' : 
+                    isPaid ? 'bg-[#0A0A0A] text-gray-600 border border-white/5 cursor-not-allowed opacity-50' :
+                    isReserved ? 'bg-accent/10 text-accent border border-accent/40 cursor-not-allowed' :
+                    'bg-[#161616] text-gray-300 hover:bg-[#222] border border-white/10 hover:border-white/30'}
                 `}
               >
-                {ticket.number.toString().padStart(3, '0')}
+                <span className="relative z-10">{ticket.number.toString().padStart(3, '0')}</span>
+                {/* Diagonal Strike for paid tickets */}
+                {isPaid && (
+                  <div className="absolute inset-0 w-full h-[2px] bg-brand top-1/2 -translate-y-1/2 rotate-45 z-20"></div>
+                )}
               </button>
             );
           })}
         </div>
       </section>
 
+      {/* Final CTA Section */}
+      <section className="bg-[#111] border-t border-white/5 rounded-2xl p-10 md:p-16 text-center max-w-4xl mx-auto">
+        <h2 className="font-heading text-3xl md:text-5xl text-white uppercase tracking-tight mb-6">
+          Não Deixe Sua Chance <span className="text-brand">Passar</span>
+        </h2>
+        <p className="text-gray-400 text-lg mb-10">
+          Garanta agora mesmo suas cotas e participe do sorteio.
+        </p>
+        <button 
+          onClick={() => {
+             if (selectedTickets.length === 0) {
+                 alert("Selecione pelo menos uma cota acima.");
+                 return;
+             }
+             setIsModalOpen(true);
+          }}
+          className="bg-brand text-white font-heading text-xl px-12 py-5 rounded-md box-glow-brand hover:scale-105 transition-all uppercase tracking-wider"
+        >
+          Comprar Agora
+        </button>
+      </section>
+
       {/* Floating Checkout Bar */}
       {selectedTickets.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 z-40 animate-in slide-in-from-bottom-5">
-          <div className="max-w-4xl mx-auto glass rounded-2xl p-4 flex items-center justify-between border border-primary/20 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-            <div>
-              <p className="text-sm text-gray-400">Total a pagar</p>
-              <p className="text-2xl font-black text-primary">R$ {(selectedTickets.length * raffle.price).toFixed(2)}</p>
+        <div className="fixed bottom-0 left-0 right-0 z-50 animate-in slide-in-from-bottom-5">
+          <div className="bg-[#0A0A0A] border-t-2 border-accent p-4 shadow-[0_-10px_40px_rgba(212,175,55,0.1)]">
+            <div className="max-w-7xl mx-auto flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400 uppercase tracking-widest font-bold mb-1">
+                  {selectedTickets.length} Cotas Selecionadas
+                </p>
+                <p className="text-2xl md:text-4xl font-heading text-gold-gradient leading-none">
+                  R$ {(selectedTickets.length * raffle.price).toFixed(2)}
+                </p>
+              </div>
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="gold-gradient text-black font-heading text-sm md:text-xl uppercase px-6 py-4 rounded-md transition-all hover:scale-105 active:scale-95 flex items-center gap-3 shadow-[0_0_20px_rgba(212,175,55,0.4)]"
+              >
+                <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
+                <span className="hidden sm:inline">Fechar Compra</span>
+              </button>
             </div>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="bg-primary hover:bg-yellow-400 text-black font-black uppercase px-8 py-3 rounded-xl transition-all hover:scale-105 active:scale-95"
-            >
-              Reservar
-            </button>
           </div>
         </div>
       )}
@@ -116,3 +147,4 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
     </main>
   );
 }
+

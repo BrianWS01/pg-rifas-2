@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -7,13 +7,21 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  weight: ["900"], // Main requirement is Black (900)
+});
+
 export const metadata: Metadata = {
   title: "Street Barber Shop RIFAS",
   description: "Plataforma premium de rifas da Street Barber Shop",
 };
 
+import Header from "@/components/Header";
+
 export const viewport = {
-  themeColor: "#000000",
+  themeColor: "#0A0A0A",
 };
 
 export default function RootLayout({
@@ -23,8 +31,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${inter.variable} antialiased selection:bg-primary/30 min-h-screen bg-background text-foreground`}>
-        {children}
+      <body className={`${inter.variable} ${montserrat.variable} antialiased selection:bg-brand/30 min-h-screen bg-background text-foreground`}>
+        <Header />
+        <div className="pt-20">
+          {children}
+        </div>
       </body>
     </html>
   );

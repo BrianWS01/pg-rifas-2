@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -18,8 +20,6 @@ export const metadata: Metadata = {
   description: "Plataforma premium de rifas da Street Barber Shop",
 };
 
-import Header from "@/components/Header";
-
 export const viewport = {
   themeColor: "#0A0A0A",
 };
@@ -31,11 +31,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased selection:bg-brand/30 min-h-screen bg-background text-foreground`}>
+      <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased selection:bg-brand/30 min-h-screen bg-background text-foreground flex flex-col`}>
         <Header />
-        <div className="pt-20">
+        <div className="pt-20 flex-grow">
           {children}
         </div>
+        <Footer />
       </body>
     </html>
   );

@@ -10,6 +10,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Street Barber Shop RIFAS",
   description: "Plataforma premium de rifas da Street Barber Shop",
+};
+
+export const viewport = {
   themeColor: "#000000",
 };
 

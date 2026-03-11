@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Ticket } from "lucide-react";
 import prisma from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const activeRaffles = await prisma.raffle.findMany({
     where: { status: "ACTIVE" },

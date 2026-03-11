@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import RaffleClient from "./RaffleClient";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function RaffleDetails({ params }: { params: { id: string } }) {
   const { id } = await params;
 

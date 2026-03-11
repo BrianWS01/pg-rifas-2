@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${inter.variable} ${montserrat.variable} antialiased selection:bg-brand/30 min-h-screen bg-background text-foreground`}>
+      <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased selection:bg-brand/30 min-h-screen bg-background text-foreground`}>
         <Header />
         <div className="pt-20">
           {children}

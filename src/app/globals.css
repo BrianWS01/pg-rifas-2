@@ -13,6 +13,7 @@
   --color-foreground: var(--foreground);
   --color-brand: var(--color-brand);
   --color-accent: var(--color-accent);
+  --color-gold-light: var(--color-gold-light);
   --font-sans: var(--font-inter);
   --font-heading: var(--font-montserrat);
 }

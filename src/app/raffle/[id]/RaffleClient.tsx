@@ -37,15 +37,15 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
 
   return (
     <main className="min-h-screen pt-8 pb-40 px-4 max-w-7xl mx-auto">
-      <Link href="/" className="inline-flex items-center text-gray-400 hover:text-white transition-colors mb-8 text-sm font-bold tracking-wider uppercase">
+      <Link href="/" className="inline-flex items-center text-[#D1D5DB] hover:text-white transition-colors mb-8 text-sm font-bold tracking-wider uppercase">
         <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
       </Link>
       
       <header className="mb-16 text-center">
-        <h1 className="font-heading text-4xl md:text-6xl text-white uppercase tracking-tight mb-4">
+        <h1 className="font-heading text-4xl md:text-6xl text-white tracking-tight mb-4 uppercase">
           Escolha Suas <span className="text-brand">Cotas</span>
         </h1>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-8">
+        <p className="text-[#D1D5DB] text-lg max-w-2xl mx-auto mb-8 font-sans">
           Selecione seus números da sorte abaixo. Quanto mais cotas você comprar, maiores as suas chances de levar o prêmio principal.
         </p>
         <div className="inline-block border-2 border-accent bg-accent/10 text-accent font-heading px-8 py-3 rounded-md text-xl md:text-2xl uppercase tracking-widest shadow-[0_0_15px_rgba(212,175,55,0.2)]">
@@ -55,7 +55,7 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
 
       <section className="mb-20">
         <div className="flex justify-between items-end mb-6">
-           <h2 className="text-xl text-gray-400 uppercase tracking-widest font-bold">Números Disponíveis</h2>
+           <h2 className="text-xl text-[#D1D5DB] uppercase tracking-widest font-heading font-black">Números Disponíveis</h2>
            <span className="text-brand font-bold">{selectedTickets.length} selecionado(s)</span>
         </div>
         
@@ -74,9 +74,9 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
                 className={`
                   relative aspect-square rounded-md font-bold text-sm md:text-base transition-all duration-300 flex items-center justify-center overflow-hidden
                   ${isSelected ? 'bg-brand text-white scale-110 shadow-[0_0_20px_rgba(212,0,0,0.6)] z-10 border-brand' : 
-                    isPaid ? 'bg-[#0A0A0A] text-gray-600 border border-white/5 cursor-not-allowed opacity-50' :
+                    isPaid ? 'bg-[#0A0A0A] text-[#D1D5DB] border border-white/5 cursor-not-allowed opacity-50' :
                     isReserved ? 'bg-accent/10 text-accent border border-accent/40 cursor-not-allowed' :
-                    'bg-[#161616] text-gray-300 hover:bg-[#222] border border-white/10 hover:border-white/30'}
+                    'bg-[#161616] text-[#D1D5DB] hover:bg-[#222] border border-[#333] hover:border-white/30'}
                 `}
               >
                 <span className="relative z-10">{ticket.number.toString().padStart(3, '0')}</span>
@@ -95,7 +95,7 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
         <h2 className="font-heading text-3xl md:text-5xl text-white uppercase tracking-tight mb-6">
           Não Deixe Sua Chance <span className="text-brand">Passar</span>
         </h2>
-        <p className="text-gray-400 text-lg mb-10">
+        <p className="text-[#D1D5DB] flex flex-col items-center text-lg mb-10 font-sans">
           Garanta agora mesmo suas cotas e participe do sorteio.
         </p>
         <button 
@@ -106,7 +106,7 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
              }
              setIsModalOpen(true);
           }}
-          className="bg-brand text-white font-heading text-xl px-12 py-5 rounded-md box-glow-brand hover:scale-105 transition-all uppercase tracking-wider"
+          className="bg-brand text-white font-heading text-xl px-12 py-5 rounded-md box-glow-brand hover:scale-105 transition-all uppercase tracking-wider animate-pulse"
         >
           Comprar Agora
         </button>
@@ -115,10 +115,10 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
       {/* Floating Checkout Bar */}
       {selectedTickets.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 z-50 animate-in slide-in-from-bottom-5">
-          <div className="bg-[#0A0A0A] border-t-2 border-accent p-4 shadow-[0_-10px_40px_rgba(212,175,55,0.1)]">
+          <div className="bg-[#0A0A0A] border-t-[2px] border-accent p-4 shadow-[0_-10px_40px_rgba(212,175,55,0.1)]">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400 uppercase tracking-widest font-bold mb-1">
+                <p className="text-sm text-[#D1D5DB] uppercase tracking-widest font-heading font-black mb-1">
                   {selectedTickets.length} Cotas Selecionadas
                 </p>
                 <p className="text-2xl md:text-4xl font-heading text-gold-gradient leading-none">
@@ -127,10 +127,10 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
               </div>
               <button 
                 onClick={() => setIsModalOpen(true)}
-                className="gold-gradient text-black font-heading text-sm md:text-xl uppercase px-6 py-4 rounded-md transition-all hover:scale-105 active:scale-95 flex items-center gap-3 shadow-[0_0_20px_rgba(212,175,55,0.4)]"
+                className="gold-gradient text-black font-heading tracking-tight text-sm md:text-2xl uppercase px-8 py-4 rounded-md transition-all hover:scale-105 active:scale-95 flex items-center gap-3 shadow-[0_0_20px_rgba(212,175,55,0.4)]"
               >
-                <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
-                <span className="hidden sm:inline">Fechar Compra</span>
+                <ShoppingCart className="w-5 h-5 md:w-8 md:h-8" />
+                <span className="hidden sm:inline font-black">Fechar Compra</span>
               </button>
             </div>
           </div>

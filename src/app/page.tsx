@@ -58,7 +58,7 @@ export default async function Home() {
                 <div className="relative h-64 bg-[#111] flex items-center justify-center overflow-hidden">
                    <div className="absolute inset-0 bg-brand/20 blur-2xl group-hover:bg-brand/40 transition-colors"></div>
                    {/* Fallback image if PS5 image is missing */}
-                   <img src="/ps5.png" alt="PS5" className="relative z-10 w-4/5 object-contain group-hover:scale-110 transition-transform duration-500" onError={(e) => { e.currentTarget.src = 'https://placehold.co/400x300/111/D40000?text=PS5+1TB' }} />
+                   <img src="/ps5.png" alt="PS5" className="relative z-10 w-4/5 object-contain group-hover:scale-110 transition-transform duration-500" />
                    
                    <div className="absolute top-4 right-4 bg-accent text-black px-3 py-1 text-xs font-bold uppercase tracking-wider z-20">
                      Apenas R$ {Number(raffle.price).toFixed(2)}

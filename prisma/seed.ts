@@ -9,14 +9,14 @@ async function main() {
   
   // 2. Create the initial Raffle
   const raffle = await prisma.raffle.upsert({
-    where: { id: 'iphone-15-pro-max' },
+    where: { id: 'ps5-ou-1500-pix' },
     update: {},
     create: {
-      id: 'iphone-15-pro-max',
-      title: 'iPhone 15 Pro Max 256GB',
-      description: 'Sorteio do novo iPhone 15 Pro Max na caixa lacrado com garantia de 1 ano. Participe e concorra!',
-      price: 0.50,
-      totalTickets: 100,
+      id: 'ps5-ou-1500-pix',
+      title: 'PS5 + 2 Controles e 1TB ou R$ 1.500 no PIX',
+      description: 'Participe e concorra a um PlayStation 5 com 2 controles e 1TB de armazenamento, ou leve R$ 1.500 direto no seu PIX se preferir!',
+      price: 15.00,
+      totalTickets: 350,
       status: 'ACTIVE',
     },
   })
@@ -29,8 +29,8 @@ async function main() {
   })
 
   if (existingTickets === 0) {
-    console.log('Generating 100 tickets...')
-    const ticketsData = Array.from({ length: 100 }).map((_, i) => ({
+    console.log('Generating 350 tickets...')
+    const ticketsData = Array.from({ length: 350 }).map((_, i) => ({
       number: i + 1,
       raffleId: raffle.id,
       status: 'AVAILABLE' as const,
@@ -39,7 +39,7 @@ async function main() {
     await prisma.ticket.createMany({
       data: ticketsData,
     })
-    console.log('100 tickets generated successfully.')
+    console.log('350 tickets generated successfully.')
   } else {
     console.log(`${existingTickets} tickets already exist for this raffle.`)
   }

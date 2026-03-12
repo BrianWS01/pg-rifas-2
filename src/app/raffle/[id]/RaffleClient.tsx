@@ -17,6 +17,7 @@ interface Raffle {
   description: string | null;
   price: number;
   totalTickets: number;
+  status: string;
   tickets: Ticket[];
 }
 
@@ -40,8 +41,17 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
       <Link href="/" className="inline-flex items-center text-[#D1D5DB] hover:text-white transition-colors mb-8 text-sm font-bold tracking-wider uppercase">
         <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
       </Link>
+
+      {raffle.status === "FINISHED" && (
+        <div className="bg-brand/10 border-2 border-brand rounded-2xl p-8 text-center mb-12 shadow-[0_0_30px_rgba(212,0,0,0.2)]">
+          <h2 className="font-heading text-3xl md:text-5xl text-white uppercase tracking-tight mb-4 text-glow-brand">
+            Sorteio Finalizado!
+          </h2>
+          <p className="text-[#D1D5DB] text-lg mb-4">Esta rifa já foi encerrada. Fique ligado na próxima!</p>
+        </div>
+      )}
       
-      <header className="mb-16 text-center">
+      <header className={`mb-16 text-center ${raffle.status === "FINISHED" ? 'opacity-50' : ''}`}>
         <h1 className="font-heading text-4xl md:text-6xl text-white tracking-tight mb-4 uppercase">
           Escolha Suas <span className="text-brand">Cotas</span>
         </h1>
@@ -69,13 +79,14 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
             return (
               <button
                 key={ticket.id}
-                disabled={!isAvailable}
+                disabled={!isAvailable || raffle.status === "FINISHED"}
                 onClick={() => toggleTicket(ticket.number)}
                 className={`
                   relative aspect-square rounded-md font-bold text-sm md:text-base transition-all duration-300 flex items-center justify-center overflow-hidden
                   ${isSelected ? 'bg-brand text-white scale-110 shadow-[0_0_20px_rgba(212,0,0,0.6)] z-10 border-brand' : 
                     isPaid ? 'bg-[#0A0A0A] text-[#D1D5DB] border border-white/5 cursor-not-allowed opacity-50' :
                     isReserved ? 'bg-accent/10 text-accent border border-accent/40 cursor-not-allowed' :
+                    raffle.status === "FINISHED" ? 'bg-[#111] text-gray-700 border-white/5 cursor-not-allowed opacity-30' :
                     'bg-[#161616] text-[#D1D5DB] hover:bg-[#222] border border-[#333] hover:border-white/30'}
                 `}
               >
@@ -91,26 +102,28 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
       </section>
 
       {/* Final CTA Section */}
-      <section className="bg-[#111] border-t border-white/5 rounded-2xl p-10 md:p-16 text-center max-w-4xl mx-auto">
-        <h2 className="font-heading text-3xl md:text-5xl text-white uppercase tracking-tight mb-6">
-          Não Deixe Sua Chance <span className="text-brand">Passar</span>
-        </h2>
-        <p className="text-[#D1D5DB] flex flex-col items-center text-lg mb-10 font-sans">
-          Garanta agora mesmo suas cotas e participe do sorteio.
-        </p>
-        <button 
-          onClick={() => {
-             if (selectedTickets.length === 0) {
-                 alert("Selecione pelo menos uma cota acima.");
-                 return;
-             }
-             setIsModalOpen(true);
-          }}
-          className="bg-brand text-white font-heading text-xl px-12 py-5 rounded-md box-glow-brand hover:scale-105 transition-all uppercase tracking-wider animate-pulse"
-        >
-          Comprar Agora
-        </button>
-      </section>
+      {raffle.status !== "FINISHED" && (
+        <section className="bg-[#111] border-t border-white/5 rounded-2xl p-10 md:p-16 text-center max-w-4xl mx-auto">
+          <h2 className="font-heading text-3xl md:text-5xl text-white uppercase tracking-tight mb-6">
+            Não Deixe Sua Chance <span className="text-brand">Passar</span>
+          </h2>
+          <p className="text-[#D1D5DB] flex flex-col items-center text-lg mb-10 font-sans">
+            Garanta agora mesmo suas cotas e participe do sorteio.
+          </p>
+          <button 
+            onClick={() => {
+               if (selectedTickets.length === 0) {
+                   alert("Selecione pelo menos uma cota acima.");
+                   return;
+               }
+               setIsModalOpen(true);
+            }}
+            className="bg-brand text-white font-heading text-xl px-12 py-5 rounded-md box-glow-brand hover:scale-105 transition-all uppercase tracking-wider animate-pulse"
+          >
+            Comprar Agora
+          </button>
+        </section>
+      )}
 
       {/* Floating Checkout Bar */}
       {selectedTickets.length > 0 && (

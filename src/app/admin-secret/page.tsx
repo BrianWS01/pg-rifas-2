@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { ArrowLeft, Users, CreditCard, Ticket as TicketIcon, DollarSign } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import DrawButton from "./DrawButton";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -9,7 +10,9 @@ export const revalidate = 0;
 export default async function AdminDashboard() {
   // Puxar a última rifa ativa (ou a única, no nosso caso atual)
   const activeRaffle = await prisma.raffle.findFirst({
-    where: { status: "ACTIVE" },
+    where: { 
+      status: { in: ["ACTIVE", "FINISHED"] } // Permitir ver rifas finalizadas no painel
+    },
     include: {
       tickets: {
         include: {
@@ -24,7 +27,7 @@ export default async function AdminDashboard() {
     return (
       <main className="min-h-screen pt-24 px-4 text-center">
         <h1 className="text-3xl font-bold text-white mb-4">Admin Dashboard</h1>
-        <p className="text-gray-400">Nenhuma rifa ativa encontrada.</p>
+        <p className="text-gray-400">Nenhuma rifa encontrada.</p>
       </main>
     );
   }
@@ -33,9 +36,9 @@ export default async function AdminDashboard() {
   const totalCotts = activeRaffle.totalTickets;
   const pricePerCota = Number(activeRaffle.price);
   
-  const availableCotts = activeRaffle.tickets.filter(t => t.status === "AVAILABLE").length;
-  const reservedCotts = activeRaffle.tickets.filter(t => t.status === "RESERVED").length;
-  const paidCotts = activeRaffle.tickets.filter(t => t.status === "PAID").length;
+  const availableCotts = activeRaffle.tickets.filter((t: any) => t.status === "AVAILABLE").length;
+  const reservedCotts = activeRaffle.tickets.filter((t: any) => t.status === "RESERVED").length;
+  const paidCotts = activeRaffle.tickets.filter((t: any) => t.status === "PAID").length;
 
   const totalRevenueExpected = totalCotts * pricePerCota;
   const revenueConfirmed = paidCotts * pricePerCota;
@@ -43,7 +46,7 @@ export default async function AdminDashboard() {
 
   // Agrupar compradores
   const buyersMap = new Map();
-  activeRaffle.tickets.forEach(ticket => {
+  activeRaffle.tickets.forEach((ticket: any) => {
     if (ticket.user && ticket.status !== 'AVAILABLE') {
       const u = ticket.user;
       if (!buyersMap.has(u.id)) {
@@ -81,9 +84,21 @@ export default async function AdminDashboard() {
         </h1>
       </div>
 
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">{activeRaffle.title}</h2>
-        <p className="text-gray-400">Visão geral e relatórios de vendas.</p>
+      <div className="mb-12">
+        <h2 className="text-xl text-brand font-bold tracking-wider uppercase mb-2">
+          {activeRaffle.status === "FINISHED" ? "CONCLUÍDO" : "EM ANDAMENTO"}
+        </h2>
+        <h3 className="text-4xl font-heading text-white">{activeRaffle.title}</h3>
+      </div>
+
+      {/* Sorteio Section */}
+      <div className="mb-16">
+        <DrawButton 
+          raffleId={activeRaffle.id} 
+          isFinished={activeRaffle.status === "FINISHED"} 
+          winnerName={activeRaffle.winnerName}
+          winnerTicketId={activeRaffle.winnerTicketId}
+        />
       </div>
 
       {/* Cards de Estatísticas */}

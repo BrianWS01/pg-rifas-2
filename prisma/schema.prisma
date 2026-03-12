@@ -24,6 +24,8 @@ model Raffle {
   price        Decimal  @db.Decimal(10, 2)
   totalTickets Int
   status       RaffleStatus @default(DRAFT)
+  winnerTicketId String?
+  winnerName     String?
   tickets      Ticket[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

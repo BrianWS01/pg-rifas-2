@@ -69,12 +69,16 @@ export async function POST(req: Request) {
       return { user, transaction, totalAmount };
     });
 
+    // Calculate expiration date (15 minutes from now)
+    const expirationDate = new Date(Date.now() + 15 * 60 * 1000);
+
     // 3. Create Mercado Pago Payment (PIX)
     const payment = await paymentClient.create({
       body: {
         transaction_amount: result.totalAmount,
         description: `Rifa: ${raffle.title} - Tickets: ${ticketNumbers.join(', ')}`,
         payment_method_id: 'pix',
+        date_of_expiration: expirationDate.toISOString(),
         payer: {
           email: 'test_user_123@testuser.com', // Mercado Pago requires an email
           first_name: result.user.name.split(' ')[0],

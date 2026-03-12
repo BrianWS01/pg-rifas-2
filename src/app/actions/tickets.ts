@@ -26,6 +26,11 @@ export async function fetchUserTickets(phone: string) {
           orderBy: {
             createdAt: 'desc'
           }
+        },
+        transactions: {
+          orderBy: {
+            createdAt: 'desc'
+          }
         }
       }
     });
@@ -44,14 +49,28 @@ export async function fetchUserTickets(phone: string) {
     return { 
       success: true, 
       user: user.name,
-      tickets: activeTickets.map(t => ({
-        id: t.id,
-        number: t.number,
-        status: t.status,
-        raffleTitle: t.raffle.title,
-        raffleStatus: t.raffle.status,
-        createdAt: t.createdAt
-      }))
+      tickets: activeTickets.map((t: any) => {
+        // Encontrar a transação mais recente associada a este ticket
+        const transaction = user.transactions.find((tr: any) => {
+          try {
+            const ticketIds = JSON.parse(tr.ticketIds);
+            return Array.isArray(ticketIds) && ticketIds.includes(t.id);
+          } catch(e) {
+            return false;
+          }
+        });
+
+        return {
+          id: t.id,
+          number: t.number,
+          status: t.status,
+          raffleTitle: t.raffle.title,
+          raffleStatus: t.raffle.status,
+          createdAt: t.createdAt,
+          pixCode: t.status === "RESERVED" && transaction ? transaction.pixCode : null,
+          pixQrCode: t.status === "RESERVED" && transaction ? transaction.pixQrCode : null
+        };
+      })
     };
 
   } catch (error) {

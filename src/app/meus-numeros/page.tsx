@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { fetchUserTickets } from "@/app/actions/tickets";
-import { ArrowLeft, Search, Ticket, Clock, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Search, Ticket, Clock, CheckCircle2, Loader2, AlertCircle, Copy, QrCode } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 type TicketInfo = {
   id: string;
@@ -12,6 +13,8 @@ type TicketInfo = {
   raffleTitle: string;
   raffleStatus: string;
   createdAt: Date;
+  pixCode: string | null;
+  pixQrCode: string | null;
 };
 
 // Função para mascarar o telefone: (99) 99999-9999
@@ -39,6 +42,10 @@ export default function MeusNumerosClient() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<{ user: string; tickets: TicketInfo[] } | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  
+  // Modal PIX State
+  const [selectedTicket, setSelectedTicket] = useState<TicketInfo | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhone(e.target.value);
@@ -70,6 +77,14 @@ export default function MeusNumerosClient() {
         setResult(null);
       }
     });
+  };
+
+  const copyToClipboard = () => {
+    if (selectedTicket?.pixCode) {
+      navigator.clipboard.writeText(selectedTicket.pixCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (
@@ -166,11 +181,19 @@ export default function MeusNumerosClient() {
                         Aprovado
                       </div>
                     ) : (
-                      <div className="flex flex-col sm:items-end">
-                        <div className="flex items-center text-accent font-bold text-sm bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+                      <div className="flex flex-col sm:items-end w-full sm:w-auto mt-2 sm:mt-0 gap-2">
+                        <div className="flex items-center text-accent font-bold text-sm bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider w-fit">
                           <Clock className="w-4 h-4 mr-2" />
                           Aguardando PIX
                         </div>
+                        {ticket.pixCode && (
+                          <button 
+                            onClick={() => setSelectedTicket(ticket)}
+                            className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg transition-colors flex items-center justify-center w-full sm:w-auto"
+                          >
+                            <QrCode className="w-3 h-3 mr-1" /> Ver PIX
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -185,10 +208,62 @@ export default function MeusNumerosClient() {
                <p className="text-sm text-gray-300 leading-relaxed">
                  Você possui cotas <strong className="text-brand">AGUARDANDO PIX</strong>. Lembre-se que as reservas expiram rapidamente. 
                  Se você não pagou o código PIX gerado anteriormente, essas cotas voltarão a ficar disponíveis para outras pessoas.
-                 Para garantir seus números, volte à página da rifa e refaça a compra ou pague o PIX pendente.
+                 Para garantir seus números, pague o PIX pendente.
                </p>
              </div>
           )}
+        </div>
+      )}
+
+      {/* Modal PIX */}
+      {selectedTicket && selectedTicket.pixCode && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setSelectedTicket(null)}
+          />
+          <div className="bg-[#111] border border-accent/20 rounded-2xl p-6 md:p-8 w-full max-w-md relative z-10 box-glow-brand animate-in zoom-in-95">
+            <h2 className="font-heading text-2xl text-center text-white mb-2 uppercase tracking-tight">
+              Pagar via <span className="text-accent">PIX</span>
+            </h2>
+            <p className="text-sm text-gray-400 text-center mb-6">
+              Escaneie o QR Code abaixo ou copie o código PIX para garantir a cota {selectedTicket.number.toString().padStart(3, '0')}
+            </p>
+
+            {selectedTicket.pixQrCode && (
+              <div className="bg-white p-4 rounded-xl mb-6 mx-auto w-fit">
+                <Image
+                  src={`data:image/jpeg;base64,${selectedTicket.pixQrCode}`}
+                  alt="QR Code PIX"
+                  width={200}
+                  height={200}
+                  className="rounded-lg"
+                />
+              </div>
+            )}
+
+            <div className="bg-black/50 border border-white/10 rounded-xl p-4 mb-6">
+              <p className="text-xs text-gray-500 mb-2 uppercase font-bold tracking-widest text-center">Código Copia e Cola</p>
+              <div className="relative">
+                <p className="font-mono text-sm text-white break-all pr-12 line-clamp-3">
+                  {selectedTicket.pixCode}
+                </p>
+                <button
+                  onClick={copyToClipboard}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-accent text-black p-2 rounded-lg hover:scale-105 transition-transform"
+                >
+                  {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => setSelectedTicket(null)}
+              className="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl transition-colors"
+            >
+              Fechar
+            </button>
+          </div>
         </div>
       )}
     </main>

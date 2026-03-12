@@ -89,10 +89,14 @@ export async function POST(req: Request) {
       },
     });
 
-    // 4. Update transaction with external (MP) ID
+    // 4. Update transaction with external (MP) ID and PIX info
     await prisma.transaction.update({
       where: { id: result.transaction.id },
-      data: { externalId: String(payment.id) },
+      data: { 
+        externalId: String(payment.id),
+        pixCode: payment.point_of_interaction?.transaction_data?.qr_code,
+        pixQrCode: payment.point_of_interaction?.transaction_data?.qr_code_base64
+      },
     });
 
     return NextResponse.json({

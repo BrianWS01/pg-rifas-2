@@ -65,6 +65,8 @@ model Transaction {
   user       User              @relation(fields: [userId], references: [id])
   userId     String
   ticketIds  String            @db.Text // JSON string to array of ticket IDs or simple comma separated
+  pixCode    String?           @db.Text // Copia e Cola
+  pixQrCode  String?           @db.Text // Imagem em Base64
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
 }

@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { fetchUserTickets } from "@/app/actions/tickets";
 import { ArrowLeft, Search, Ticket, Clock, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import InputMask from "react-input-mask";
 
 type TicketInfo = {
   id: string;
@@ -15,12 +14,39 @@ type TicketInfo = {
   createdAt: Date;
 };
 
+// Função para mascarar o telefone: (99) 99999-9999
+const formatPhone = (value: string) => {
+  if (!value) return "";
+  const phone = value.replace(/\D/g, "");
+  const match = phone.match(/^(\d{0,2})(\d{0,5})(\d{0,4})$/);
+  
+  if (!match) return value;
+  
+  if (match[3]) {
+    return `(${match[1]}) ${match[2]}-${match[3]}`;
+  } else if (match[2]) {
+    return `(${match[1]}) ${match[2]}`;
+  } else if (match[1]) {
+    // Apenas se o usuário já digitou algo, adicionamos os parênteses
+    return phone.length >= 2 ? `(${match[1]}) ` : `(${match[1]}`;
+  }
+  return phone;
+};
+
 export default function MeusNumerosClient() {
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<{ user: string; tickets: TicketInfo[] } | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhone(e.target.value);
+    // Limita o tamanho máximo da string formatada "(11) 99999-9999" = 15 chars
+    if (formatted.length <= 15) {
+      setPhone(formatted);
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,10 +94,10 @@ export default function MeusNumerosClient() {
       <div className="bg-[#111] border border-white/5 rounded-2xl p-6 md:p-8 mb-12">
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
           <div className="flex-grow">
-            <InputMask
-              mask="(99) 99999-9999"
+            <input
+              type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={handlePhoneChange}
               placeholder="(00) 00000-0000"
               className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-4 text-white font-mono text-lg focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-all placeholder:text-gray-600"
               required
@@ -79,7 +105,7 @@ export default function MeusNumerosClient() {
           </div>
           <button 
             type="submit"
-            disabled={isPending || !phone}
+            disabled={isPending || phone.replace(/\D/g, "").length < 10}
             className="gold-gradient text-black font-heading tracking-widest px-8 py-4 rounded-lg flex items-center justify-center gap-2 hover:scale-105 transition-all uppercase disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed whitespace-nowrap"
           >
             {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}

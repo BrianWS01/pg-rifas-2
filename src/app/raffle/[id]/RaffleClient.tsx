@@ -53,11 +53,33 @@ export default function RaffleClient({ raffle }: { raffle: Raffle }) {
       
       <header className={`mb-16 text-center ${raffle.status === "FINISHED" ? 'opacity-50' : ''}`}>
         <h1 className="font-heading text-4xl md:text-6xl text-white tracking-tight mb-4 uppercase">
-          Escolha Suas <span className="text-brand">Cotas</span>
+          Escolha Seus <span className="text-brand">Números</span>
         </h1>
         <p className="text-[#D1D5DB] text-lg max-w-2xl mx-auto mb-8 font-sans">
           Selecione seus números da sorte abaixo. Quanto mais cotas você comprar, maiores as suas chances de levar o prêmio principal.
         </p>
+        
+        {/* Ticket Legend */}
+        <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-8 text-sm md:text-base text-gray-400 font-sans">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-[#161616] border border-[#333]"></div>
+            <span>Livre</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-brand border border-brand shadow-[0_0_10px_rgba(212,0,0,0.6)]"></div>
+            <span className="text-white">Selecionado</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-accent/10 border border-accent/40 text-accent flex items-center justify-center"></div>
+            <span className="text-accent">Reservado</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="relative w-6 h-6 rounded bg-[#0A0A0A] border border-white/5 overflow-hidden">
+                <div className="absolute inset-0 w-full h-[2px] bg-brand top-1/2 -translate-y-1/2 rotate-45"></div>
+            </div>
+            <span>Pago (Indisponível)</span>
+          </div>
+        </div>
         <div className="inline-block border-2 border-accent bg-accent/10 text-accent font-heading px-8 py-3 rounded-md text-xl md:text-2xl uppercase tracking-widest shadow-[0_0_15px_rgba(212,175,55,0.2)]">
           Valor da cota: R$ {raffle.price.toFixed(2)}
         </div>

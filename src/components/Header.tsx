@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogIn } from "lucide-react";
+import { Ticket as TicketIcon } from "lucide-react";
 
 export default function Header() {
   return (
@@ -8,10 +8,14 @@ export default function Header() {
         <Link href="/" className="font-heading text-2xl md:text-3xl tracking-tight text-white">
           STREET <span className="text-brand">BARBERSHOP</span>
         </Link>
-        <button className="gold-gradient text-black font-heading tracking-widest px-6 py-2 rounded-lg flex items-center gap-2 hover:scale-105 transition-transform uppercase">
-          <LogIn className="w-5 h-5" />
-          <span>Login</span>
-        </button>
+        <Link 
+          href="/meus-numeros"
+          className="gold-gradient text-black font-heading tracking-widest px-6 py-2 rounded-lg flex items-center gap-2 hover:scale-105 transition-transform uppercase"
+        >
+          <TicketIcon className="w-5 h-5" />
+          <span className="hidden sm:inline">Meus Números</span>
+          <span className="sm:hidden">Números</span>
+        </Link>
       </div>
     </header>
   );

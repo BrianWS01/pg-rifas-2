@@ -18,6 +18,10 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Street Barber Shop RIFAS",
   description: "Plataforma premium de rifas da Street Barber Shop",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/icon.png",
+  },
 };
 
 export const viewport = {

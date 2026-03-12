@@ -80,13 +80,9 @@ export async function POST(req: Request) {
         payment_method_id: 'pix',
         date_of_expiration: expirationDate.toISOString(),
         payer: {
-          email: 'test_user_123@testuser.com', // Mercado Pago requires an email
-          first_name: result.user.name.split(' ')[0],
-          last_name: result.user.name.split(' ').slice(1).join(' ') || 'User',
-          identification: {
-            type: 'CPF',
-            number: '19100000000', // Mock CPF for testing
-          },
+          email: 'pagamentos@streetbarbershoprifas.com.br',
+          first_name: result.user.name.split(' ')[0] || 'Cliente',
+          last_name: result.user.name.split(' ').slice(1).join(' ') || 'Street',
         },
         notification_url: process.env.MP_WEBHOOK_URL,
         external_reference: result.transaction.id,

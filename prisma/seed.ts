@@ -3,11 +3,13 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  // 1. Clean up existing data (optional, useful for testing)
-  // await prisma.ticket.deleteMany({})
-  // await prisma.raffle.deleteMany({})
-  
-  // 2. Create the initial Raffle
+  console.log('Resetting Database...')
+  // 1. Clean up existing data (Wipes everything clean for a fresh start)
+  await prisma.transaction.deleteMany({})
+  await prisma.ticket.deleteMany({})
+  await prisma.raffle.deleteMany({})
+  await prisma.user.deleteMany({})
+  console.log('Old records deleted.')
   const raffle = await prisma.raffle.upsert({
     where: { id: 'ps5-ou-1500-pix' },
     update: {},

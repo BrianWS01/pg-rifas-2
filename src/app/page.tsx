@@ -5,10 +5,15 @@ import prisma from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const activeRaffles = await prisma.raffle.findMany({
-    where: { status: "ACTIVE" },
-    orderBy: { createdAt: "desc" },
-  });
+  let activeRaffles: any[] = [];
+  try {
+    activeRaffles = await prisma.raffle.findMany({
+      where: { status: "ACTIVE" },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (error) {
+    console.error("DB error on home page:", error);
+  }
 
   return (
     <main className="min-h-screen pb-16">

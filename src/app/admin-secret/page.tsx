@@ -3,34 +3,37 @@ import { ArrowLeft, Users, CreditCard, Ticket as TicketIcon, DollarSign } from "
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import DrawButton from "./DrawButton";
+import CleanupButton from "./CleanupButton";
+import ConfirmPaymentButton from "./ConfirmPaymentButton";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminDashboard() {
-  // Puxar a última rifa ativa (ou a única, no nosso caso atual)
-  const activeRaffle = await prisma.raffle.findFirst({
-    where: { 
-      status: { in: ["ACTIVE", "FINISHED"] } // Permitir ver rifas finalizadas no painel
-    },
-    include: {
-      tickets: {
-        include: {
-          user: true
+  try {
+    // Puxar a última rifa ativa (ou a única, no nosso caso atual)
+    const activeRaffle = await prisma.raffle.findFirst({
+      where: { 
+        status: { in: ["ACTIVE", "FINISHED"] } // Permitir ver rifas finalizadas no painel
+      },
+      include: {
+        tickets: {
+          include: {
+            user: true
+          }
         }
-      }
-    },
-    orderBy: { createdAt: "desc" }
-  });
+      },
+      orderBy: { createdAt: "desc" }
+    });
 
-  if (!activeRaffle) {
-    return (
-      <main className="min-h-screen pt-24 px-4 text-center">
-        <h1 className="text-3xl font-bold text-white mb-4">Admin Dashboard</h1>
-        <p className="text-gray-400">Nenhuma rifa encontrada.</p>
-      </main>
-    );
-  }
+    if (!activeRaffle) {
+      return (
+        <main className="min-h-screen pt-24 px-4 text-center">
+          <h1 className="text-3xl font-bold text-white mb-4">Admin Dashboard</h1>
+          <p className="text-gray-400">Nenhuma rifa encontrada.</p>
+        </main>
+      );
+    }
 
   // Estatísticas Rápidas
   const totalCotts = activeRaffle.totalTickets;
@@ -105,23 +108,7 @@ export default async function AdminDashboard() {
            <div className="bg-[#111] border border-white/5 rounded-2xl p-6 h-full flex flex-col justify-center">
               <h4 className="text-white font-bold mb-2 uppercase text-sm">Reserva Travada?</h4>
               <p className="text-gray-500 text-xs mb-4">Se houver números presos que não foram pagos, clique abaixo para liberar.</p>
-              <button 
-                onClick={async () => {
-                   if (confirm("Deseja limpar reservas antigas ou sem pagamento?")) {
-                      const res = await fetch('/api/admin/cleanup', { method: 'POST' });
-                      const data = await res.json();
-                      if (data.success) {
-                         alert(`Limpeza concluída! ${data.expiredReset + data.orphanedReset} cotas liberadas.`);
-                         window.location.reload();
-                      } else {
-                         alert("Erro ao limpar: " + data.error);
-                      }
-                   }
-                }}
-                className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-lg transition-colors text-sm uppercase tracking-wider"
-              >
-                Limpar Reservas
-              </button>
+              <CleanupButton />
            </div>
         </div>
       </div>
@@ -232,24 +219,12 @@ export default async function AdminDashboard() {
                     </td>
                     <td className="p-4 text-right flex flex-col md:flex-row justify-end gap-2">
                       {buyer.reserved.length > 0 && (
-                        <button 
-                          onClick={async () => {
-                            if (confirm(`Confirmar pagamento de R$ ${(buyer.reserved.length * Number(activeRaffle.price)).toFixed(2)} para ${buyer.name}?`)) {
-                              const res = await fetch('/api/admin/confirm-payment', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ ticketNumbers: buyer.reserved, phone: buyer.phone })
-                              });
-                              if (res.ok) {
-                                alert("Pagamento confirmado!");
-                                window.location.reload();
-                              }
-                            }
-                          }}
-                          className="inline-block bg-green-500/20 text-green-500 hover:bg-green-500 hover:text-white font-bold px-4 py-2 rounded transition-colors text-xs uppercase tracking-wider"
-                        >
-                          Confirmar Pago
-                        </button>
+                        <ConfirmPaymentButton 
+                          ticketNumbers={buyer.reserved}
+                          phone={buyer.phone}
+                          userName={buyer.name}
+                          price={pricePerCota}
+                        />
                       )}
                       <a 
                         href={`https://wa.me/${buyer.phone.replace(/\D/g, '')}?text=Olá%20${encodeURIComponent(buyer.name)},%20vi%20que%20você%20reservou%20cotas%20na%20nossa%20rifa!`}
@@ -268,5 +243,20 @@ export default async function AdminDashboard() {
         )}
       </div>
     </main>
-  );
+    );
+  } catch (error: any) {
+    console.error("Admin Dashboard Error:", error);
+    return (
+      <main className="min-h-screen pt-24 px-4 text-center">
+        <h1 className="text-3xl font-bold text-white mb-4">Erro no Servidor</h1>
+        <p className="text-red-500 mb-8 max-w-lg mx-auto">
+          Ocorreu um erro ao carregar os dados do banco de dados na Hostinger. 
+          Verifique se a conexão remota está ativa e se as variáveis de ambiente na Vercel estão corretas.
+        </p>
+        <div className="bg-[#111] border border-white/5 p-4 rounded-xl inline-block text-left text-xs font-mono text-gray-500 overflow-auto max-w-full">
+          {error.message || "Erro desconhecido"}
+        </div>
+      </main>
+    );
+  }
 }

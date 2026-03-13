@@ -4,14 +4,17 @@ import { paymentClient } from '@/lib/mercadopago';
 
 export async function POST(req: Request) {
   try {
+    const body = await req.json().catch(() => ({}));
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get('data.id') || searchParams.get('id');
-    const type = searchParams.get('type');
+    
+    // Get ID from query params (data.id or id) OR from request body
+    const id = searchParams.get('data.id') || searchParams.get('id') || body.data?.id || body.id;
+    const type = searchParams.get('type') || body.type;
 
-    console.log(`Webhook received: ID=${id}, Type=${type}`);
+    console.log(`Webhook received: ID=${id}, Type=${type}`, { body, query: Object.fromEntries(searchParams) });
 
     // Mercado Pago sends different types of notifications. We care about 'payment'.
-    if (type === 'payment' && id) {
+    if (id && (type === 'payment' || body.action?.includes('payment'))) {
       // 1. Fetch the payment details from Mercado Pago to verify status
       const payment = await paymentClient.get({ id: String(id) });
       

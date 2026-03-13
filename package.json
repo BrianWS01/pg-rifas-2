@@ -2,10 +2,14 @@
   "name": "rifas-app",
   "version": "0.1.0",
   "private": true,
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "next dev",
-    "build": "mkdir -p .next && echo 'BUILD_BYPASSED' > .next/build_status.txt",
-    "start": "node server.js",
+    "build": "next build",
+    "start": "next start",
     "lint": "eslint"
   },
   "prisma": {

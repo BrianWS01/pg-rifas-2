@@ -92,13 +92,38 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Sorteio Section */}
-      <div className="mb-16">
-        <DrawButton 
-          raffleId={activeRaffle.id} 
-          isFinished={activeRaffle.status === "FINISHED"} 
-          winnerName={activeRaffle.winnerName}
-          winnerTicketId={activeRaffle.winnerTicketId}
-        />
+      <div className="flex flex-col md:flex-row gap-6 mb-16">
+        <div className="flex-1">
+          <DrawButton 
+            raffleId={activeRaffle.id} 
+            isFinished={activeRaffle.status === "FINISHED"} 
+            winnerName={activeRaffle.winnerName}
+            winnerTicketId={activeRaffle.winnerTicketId}
+          />
+        </div>
+        <div className="md:w-1/3">
+           <div className="bg-[#111] border border-white/5 rounded-2xl p-6 h-full flex flex-col justify-center">
+              <h4 className="text-white font-bold mb-2 uppercase text-sm">Reserva Travada?</h4>
+              <p className="text-gray-500 text-xs mb-4">Se houver números presos que não foram pagos, clique abaixo para liberar.</p>
+              <button 
+                onClick={async () => {
+                   if (confirm("Deseja limpar reservas antigas ou sem pagamento?")) {
+                      const res = await fetch('/api/admin/cleanup', { method: 'POST' });
+                      const data = await res.json();
+                      if (data.success) {
+                         alert(`Limpeza concluída! ${data.expiredReset + data.orphanedReset} cotas liberadas.`);
+                         window.location.reload();
+                      } else {
+                         alert("Erro ao limpar: " + data.error);
+                      }
+                   }
+                }}
+                className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-lg transition-colors text-sm uppercase tracking-wider"
+              >
+                Limpar Reservas
+              </button>
+           </div>
+        </div>
       </div>
 
       {/* Cards de Estatísticas */}

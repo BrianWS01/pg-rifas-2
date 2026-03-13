@@ -234,7 +234,7 @@ export default async function AdminDashboard() {
                       {buyer.reserved.length > 0 && (
                         <button 
                           onClick={async () => {
-                            if (confirm(`Confirmar pagamento de R$ ${(buyer.reserved.length * activeRaffle.price).toFixed(2)} para ${buyer.name}?`)) {
+                            if (confirm(`Confirmar pagamento de R$ ${(buyer.reserved.length * Number(activeRaffle.price)).toFixed(2)} para ${buyer.name}?`)) {
                               const res = await fetch('/api/admin/confirm-payment', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },

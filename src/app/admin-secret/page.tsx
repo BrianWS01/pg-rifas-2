@@ -230,15 +230,35 @@ export default async function AdminDashboard() {
                         <span className="text-gray-600">-</span>
                       )}
                     </td>
-                    <td className="p-4 text-right">
-                       <a 
-                          href={`https://wa.me/${buyer.phone.replace(/\D/g, '')}?text=Olá%20${encodeURIComponent(buyer.name)},%20vi%20que%20você%20reservou%20cotas%20na%20nossa%20rifa!`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-block bg-[#25D366]/20 text-[#25D366] hover:bg-[#25D366] hover:text-black font-bold px-4 py-2 rounded transition-colors text-xs uppercase tracking-wider"
-                       >
-                         Chamar no Whats
-                       </a>
+                    <td className="p-4 text-right flex flex-col md:flex-row justify-end gap-2">
+                      {buyer.reserved.length > 0 && (
+                        <button 
+                          onClick={async () => {
+                            if (confirm(`Confirmar pagamento de R$ ${(buyer.reserved.length * activeRaffle.price).toFixed(2)} para ${buyer.name}?`)) {
+                              const res = await fetch('/api/admin/confirm-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ ticketNumbers: buyer.reserved, phone: buyer.phone })
+                              });
+                              if (res.ok) {
+                                alert("Pagamento confirmado!");
+                                window.location.reload();
+                              }
+                            }
+                          }}
+                          className="inline-block bg-green-500/20 text-green-500 hover:bg-green-500 hover:text-white font-bold px-4 py-2 rounded transition-colors text-xs uppercase tracking-wider"
+                        >
+                          Confirmar Pago
+                        </button>
+                      )}
+                      <a 
+                        href={`https://wa.me/${buyer.phone.replace(/\D/g, '')}?text=Olá%20${encodeURIComponent(buyer.name)},%20vi%20que%20você%20reservou%20cotas%20na%20nossa%20rifa!`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block bg-[#25D366]/20 text-[#25D366] hover:bg-[#25D366] hover:text-black font-bold px-4 py-2 rounded transition-colors text-xs uppercase tracking-wider"
+                      >
+                        WhatsApp
+                      </a>
                     </td>
                   </tr>
                 ))}

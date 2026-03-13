@@ -45,3 +45,6 @@ next-env.d.ts
 # build/deploy artifacts
 /dist/
 *.zip
+
+# local generated server (Next.js standalone build output)
+server.js

@@ -5,9 +5,10 @@ import prisma from '@/lib/prisma';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const secret = searchParams.get('secret');
+  const setupSecret = process.env.SETUP_DB_SECRET || 'RifasPg2026';
 
   // Segurança simples para evitar acessos indesejados
-  if (secret !== 'RifasPg2026') {
+  if (secret !== setupSecret) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
 

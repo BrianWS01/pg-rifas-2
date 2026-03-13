@@ -3,15 +3,14 @@ import prisma from '@/lib/prisma';
 
 export async function POST(req: Request) {
   try {
-    // 1. Encontrar tickets RESERVADOS há mais de 30 minutos
-    // Ou tickets RESERVADOS que não tem transação (reservas órfãs)
-    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    // 1. Encontrar tickets RESERVADOS há mais de 16 minutos (margem de 1 min após o PIX de 15 min expirar)
+    const sixteenMinutesAgo = new Date(Date.now() - 16 * 60 * 1000);
 
     // Tickets expirados (mais de 30 min)
     const expiredTickets = await prisma.ticket.findMany({
       where: {
         status: 'RESERVED',
-        updatedAt: { lte: thirtyMinutesAgo }
+        updatedAt: { lte: sixteenMinutesAgo }
       }
     });
 

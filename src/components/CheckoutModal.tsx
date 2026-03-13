@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function CheckoutModal({
   isOpen,
@@ -19,6 +19,23 @@ export default function CheckoutModal({
   const [phone, setPhone] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [pixCode, setPixCode] = useState("");
+  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
+
+  useEffect(() => {
+    if (!pixCode || timeLeft <= 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [pixCode, timeLeft]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
 
   if (!isOpen) return null;
 
@@ -76,7 +93,19 @@ export default function CheckoutModal({
                 COPIAR
               </button>
             </div>
-            <p className="text-center text-accent text-sm font-semibold mt-4">Aguardando pagamento...</p>
+            <div className="flex flex-col items-center justify-center space-y-2">
+              <p className="text-center text-accent text-sm font-semibold">Aguardando pagamento...</p>
+              <div className="bg-primary/10 border border-primary/20 px-4 py-1 rounded-full">
+                <p className="text-primary font-mono font-bold text-lg">
+                  {timeLeft > 0 ? formatTime(timeLeft) : "EXPIRADO"}
+                </p>
+              </div>
+              {timeLeft <= 0 && (
+                <p className="text-red-500 text-xs text-center animate-pulse">
+                  Sua reserva expirou. Se já pagou, aguarde 1 min.
+                </p>
+              )}
+            </div>
           </div>
         ) : (
           <form onSubmit={handleCheckout} className="space-y-4">

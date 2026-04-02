@@ -19,6 +19,7 @@ export default function CheckoutModal({
   const [phone, setPhone] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [pixCode, setPixCode] = useState("");
+  const [qrBase64, setQrBase64] = useState("");
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
 
   useEffect(() => {
@@ -77,6 +78,7 @@ export default function CheckoutModal({
       }
 
       setPixCode(data.pix_code);
+      setQrBase64(data.qr_code_base64);
     } catch (error: any) {
       alert(error.message);
     } finally {
@@ -97,7 +99,7 @@ export default function CheckoutModal({
         {pixCode ? (
           <div className="space-y-4 animate-in fade-in zoom-in duration-300">
             <div className="p-4 bg-white rounded-lg flex items-center justify-center">
-               <img src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${pixCode}`} alt="QR Code PIX" className="w-48 h-48" />
+               <img src={qrBase64 ? `data:image/png;base64,${qrBase64}` : `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(pixCode)}`} alt="QR Code PIX" className="w-48 h-48" />
             </div>
             <div className="flex flex-col space-y-3">
               <input readOnly value={pixCode} className="w-full bg-black/50 border border-white/10 rounded-lg py-3 px-4 text-sm text-gray-300 font-mono focus:outline-none text-center" />

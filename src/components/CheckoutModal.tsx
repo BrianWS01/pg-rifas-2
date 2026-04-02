@@ -39,6 +39,21 @@ export default function CheckoutModal({
 
   if (!isOpen) return null;
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value.replace(/\D/g, "");
+    if (val.length > 11) val = val.slice(0, 11);
+    
+    let formatted = val;
+    if (val.length > 2) {
+      formatted = `(${val.slice(0, 2)}) ${val.slice(2)}`;
+    }
+    if (val.length > 7) {
+      formatted = `(${val.slice(0, 2)}) ${val.slice(2, 7)}-${val.slice(7)}`;
+    }
+    
+    setPhone(formatted);
+  };
+
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
@@ -76,7 +91,7 @@ export default function CheckoutModal({
         
         <h2 className="text-2xl font-bold mb-2">Finalizar Reserva</h2>
         <p className="text-gray-400 mb-6 font-light">
-          Você selecionou {selectedTickets.length} cota(s) por <strong className="text-primary">R$ {totalPrice.toFixed(2)}</strong>.
+          Você selecionou {selectedTickets.length} cota(s) por <strong className="text-brand">R$ {totalPrice.toFixed(2)}</strong>.
         </p>
 
         {pixCode ? (
@@ -84,19 +99,20 @@ export default function CheckoutModal({
             <div className="p-4 bg-white rounded-lg flex items-center justify-center">
                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${pixCode}`} alt="QR Code PIX" className="w-48 h-48" />
             </div>
-            <div className="relative">
-              <input readOnly value={pixCode} className="w-full bg-black/50 border border-white/10 rounded-lg py-3 px-4 text-sm text-gray-300 font-mono focus:outline-none" />
+            <div className="flex flex-col space-y-3">
+              <input readOnly value={pixCode} className="w-full bg-black/50 border border-white/10 rounded-lg py-3 px-4 text-sm text-gray-300 font-mono focus:outline-none text-center" />
               <button 
+                type="button"
                 onClick={() => navigator.clipboard.writeText(pixCode)}
-                className="absolute right-2 top-2 bg-primary text-black px-4 py-1.5 rounded-md text-xs font-bold hover:bg-yellow-400 transition"
+                className="w-full bg-brand text-white py-4 rounded-lg font-bold uppercase tracking-wider text-sm hover:scale-105 transition-all box-glow-brand"
               >
-                COPIAR
+                COPIAR CÓDIGO PIX
               </button>
             </div>
-            <div className="flex flex-col items-center justify-center space-y-2">
+            <div className="flex flex-col items-center justify-center space-y-2 mt-4">
               <p className="text-center text-accent text-sm font-semibold">Aguardando pagamento...</p>
-              <div className="bg-primary/10 border border-primary/20 px-4 py-1 rounded-full">
-                <p className="text-primary font-mono font-bold text-lg">
+              <div className="bg-brand/10 border border-brand/20 px-4 py-1 rounded-full">
+                <p className="text-brand font-mono font-bold text-lg">
                   {timeLeft > 0 ? formatTime(timeLeft) : "EXPIRADO"}
                 </p>
               </div>
@@ -116,8 +132,8 @@ export default function CheckoutModal({
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-black/50 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-primary transition"
-                placeholder="Seu nome"
+                className="w-full bg-black/50 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-brand transition"
+                placeholder="SEU NOME E SOBRENOME COMPLETO"
               />
             </div>
             <div>
@@ -125,16 +141,17 @@ export default function CheckoutModal({
               <input
                 type="tel"
                 required
-                value={process.env.NEXT_PUBLIC_MOCK ? "11999999999" : phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full bg-black/50 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-primary transition"
+                value={process.env.NEXT_PUBLIC_MOCK ? "(11) 99999-9999" : phone}
+                onChange={handlePhoneChange}
+                maxLength={15}
+                className="w-full bg-black/50 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-brand transition"
                 placeholder="(11) 99999-9999"
               />
             </div>
             <button
               type="submit"
               disabled={isProcessing}
-              className="w-full bg-primary text-black font-bold py-4 rounded-lg mt-6 hover:bg-yellow-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-brand text-white font-bold py-4 rounded-lg mt-6 hover:scale-105 transition-all box-glow-brand disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider text-sm mt-8"
             >
               {isProcessing ? "Gerando PIX..." : "Gerar PIX Copia e Cola"}
             </button>

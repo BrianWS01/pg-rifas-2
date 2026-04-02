@@ -25,6 +25,14 @@ export default function CheckoutModal({
   const [isCopied, setIsCopied] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
 
+  // Load saved user info
+  useEffect(() => {
+    const savedName = localStorage.getItem("rifa_user_name");
+    const savedPhone = localStorage.getItem("rifa_user_phone");
+    if (savedName) setName(savedName);
+    if (savedPhone) setPhone(savedPhone);
+  }, []);
+
   useEffect(() => {
     if (!pixCode || timeLeft <= 0 || isPaid) return;
 
@@ -77,6 +85,17 @@ export default function CheckoutModal({
     setPhone(formatted);
   };
 
+  const handleCloseModal = () => {
+    // If they generated a PIX, the backend marked tickets as reserved.
+    // If they just close without paying, we must reload the page so they see the real ticket status
+    // and don't accidentally try to re-buy the same tickets.
+    if (pixCode && !isPaid) {
+      window.location.reload();
+    } else {
+      onClose();
+    }
+  };
+
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
@@ -102,6 +121,11 @@ export default function CheckoutModal({
       setPixCode(data.pix_code);
       setQrBase64(data.qr_code_base64);
       setTransactionId(data.transactionId);
+      
+      // Save info for future purchases
+      localStorage.setItem("rifa_user_name", name);
+      localStorage.setItem("rifa_user_phone", phone);
+      
     } catch (error: any) {
       alert(error.message);
     } finally {
@@ -111,8 +135,8 @@ export default function CheckoutModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative glass w-full max-w-md rounded-2xl p-6 shadow-2xl border border-primary/20">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={handleCloseModal} />
+      <div className="relative glass w-full max-w-md rounded-2xl p-6 shadow-2xl border border-brand/20">
         
         <h2 className="text-2xl font-bold mb-2">Finalizar Reserva</h2>
         <p className="text-gray-400 mb-6 font-light">

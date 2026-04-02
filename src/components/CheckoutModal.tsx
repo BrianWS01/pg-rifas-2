@@ -21,16 +21,38 @@ export default function CheckoutModal({
   const [pixCode, setPixCode] = useState("");
   const [qrBase64, setQrBase64] = useState("");
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
+  const [transactionId, setTransactionId] = useState("");
+  const [isCopied, setIsCopied] = useState(false);
+  const [isPaid, setIsPaid] = useState(false);
 
   useEffect(() => {
-    if (!pixCode || timeLeft <= 0) return;
+    if (!pixCode || timeLeft <= 0 || isPaid) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => prev - 1);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [pixCode, timeLeft]);
+  }, [pixCode, timeLeft, isPaid]);
+
+  // Polling for transaction status
+  useEffect(() => {
+    if (!transactionId || isPaid || timeLeft <= 0) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/transaction/${transactionId}`);
+        const data = await res.json();
+        if (data.status === 'APPROVED') {
+          setIsPaid(true);
+        }
+      } catch (err) {
+        console.error("Polling error", err);
+      }
+    }, 3000); // Poll every 3 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [transactionId, isPaid, timeLeft]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -79,6 +101,7 @@ export default function CheckoutModal({
 
       setPixCode(data.pix_code);
       setQrBase64(data.qr_code_base64);
+      setTransactionId(data.transactionId);
     } catch (error: any) {
       alert(error.message);
     } finally {
@@ -96,7 +119,21 @@ export default function CheckoutModal({
           Você selecionou {selectedTickets.length} cota(s) por <strong className="text-brand">R$ {totalPrice.toFixed(2)}</strong>.
         </p>
 
-        {pixCode ? (
+        {isPaid ? (
+          <div className="flex flex-col items-center justify-center p-6 text-center animate-in fade-in zoom-in">
+            <div className="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mb-4 box-glow-brand shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2 uppercase">Pagamento Aprovado!</h3>
+            <p className="text-gray-400 mb-6 font-light">Seu PIX foi processado com sucesso. Seus números já estão garantidos.</p>
+            <button 
+              onClick={() => window.location.href = '/meus-numeros'}
+              className="w-full bg-green-500 text-black font-bold uppercase tracking-widest text-sm py-4 rounded-lg hover:scale-105 transition-transform"
+            >
+              Ver Meus Números
+            </button>
+          </div>
+        ) : pixCode ? (
           <div className="space-y-4 animate-in fade-in zoom-in duration-300">
             <div className="p-4 bg-white rounded-lg flex items-center justify-center">
                <img src={qrBase64 ? `data:image/png;base64,${qrBase64}` : `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(pixCode)}`} alt="QR Code PIX" className="w-48 h-48" />
@@ -105,10 +142,14 @@ export default function CheckoutModal({
               <input readOnly value={pixCode} className="w-full bg-black/50 border border-white/10 rounded-lg py-3 px-4 text-sm text-gray-300 font-mono focus:outline-none text-center" />
               <button 
                 type="button"
-                onClick={() => navigator.clipboard.writeText(pixCode)}
-                className="w-full bg-brand text-white py-4 rounded-lg font-bold uppercase tracking-wider text-sm hover:scale-105 transition-all box-glow-brand"
+                onClick={() => {
+                  navigator.clipboard.writeText(pixCode);
+                  setIsCopied(true);
+                  setTimeout(() => setIsCopied(false), 3000);
+                }}
+                className={`w-full text-white py-4 rounded-lg font-bold uppercase tracking-wider text-sm transition-all box-glow-brand ${isCopied ? 'bg-green-500 text-black scale-95' : 'bg-brand hover:scale-105'}`}
               >
-                COPIAR CÓDIGO PIX
+                {isCopied ? "COPIADO! ✔️" : "COPIAR CÓDIGO PIX"}
               </button>
             </div>
             <div className="flex flex-col items-center justify-center space-y-2 mt-4">

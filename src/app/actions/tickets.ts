@@ -11,8 +11,10 @@ export async function fetchUserTickets(phone: string) {
         return { success: false, error: "Telefone inválido." };
     }
 
-    const user = await prisma.user.findUnique({
-      where: { phone: cleanPhone },
+    const user = await prisma.user.findFirst({
+      where: { 
+        phone: { contains: cleanPhone.slice(-8) } 
+      },
       include: {
         tickets: {
           include: {

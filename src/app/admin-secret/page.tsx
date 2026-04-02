@@ -6,10 +6,20 @@ import DrawButton from "./DrawButton";
 import CleanupButton from "./CleanupButton";
 import ConfirmPaymentButton from "./ConfirmPaymentButton";
 
+import { cookies } from "next/headers";
+import LoginForm from "./LoginForm";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminDashboard() {
+  const cookieStore = await cookies();
+  const isAuthenticated = cookieStore.get("admin_auth")?.value === process.env.ADMIN_PASSWORD;
+
+  if (!isAuthenticated) {
+    return <LoginForm />;
+  }
+
   try {
     // Puxar a última rifa ativa (ou a única, no nosso caso atual)
     const activeRaffle = await prisma.raffle.findFirst({

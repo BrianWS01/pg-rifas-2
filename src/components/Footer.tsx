@@ -15,10 +15,10 @@ export default function Footer() {
         </div>
 
         <div className="flex items-center gap-6">
-          <a href="#" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white hover:border-brand hover:text-brand transition-colors">
+          <a href="https://www.instagram.com/street_barbershop10/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white hover:border-brand hover:text-brand transition-colors">
             <Instagram className="w-5 h-5" />
           </a>
-          <a href="#" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white hover:border-[#25D366] hover:text-[#25D366] transition-colors">
+          <a href="https://wa.me/5511955506042" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-white hover:border-[#25D366] hover:text-[#25D366] transition-colors">
             <MessageCircle className="w-5 h-5" />
           </a>
         </div>

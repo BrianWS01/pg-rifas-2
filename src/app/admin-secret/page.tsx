@@ -14,7 +14,8 @@ export const revalidate = 0;
 
 export default async function AdminDashboard() {
   const cookieStore = await cookies();
-  const isAuthenticated = cookieStore.get("admin_auth")?.value === process.env.ADMIN_PASSWORD;
+  const validPassword = process.env.ADMIN_PASSWORD || process.env.MP_CLIENT_SECRET;
+  const isAuthenticated = cookieStore.get("admin_auth")?.value === validPassword;
 
   if (!isAuthenticated) {
     return <LoginForm />;

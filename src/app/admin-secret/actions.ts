@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 
 export async function loginAction(password: string) {
-  const correctPassword = process.env.ADMIN_PASSWORD;
+  const correctPassword = process.env.ADMIN_PASSWORD || process.env.MP_CLIENT_SECRET;
 
   if (password === correctPassword) {
     // Generate a secure but simple admin auth cookie

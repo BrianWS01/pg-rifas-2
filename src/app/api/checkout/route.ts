@@ -84,7 +84,7 @@ export async function POST(req: Request) {
           first_name: result.user.name.split(' ')[0] || 'Cliente',
           last_name: result.user.name.split(' ').slice(1).join(' ') || 'Street',
         },
-        notification_url: process.env.MP_WEBHOOK_URL,
+        notification_url: process.env.URL_do_WEBHOOK_MP || process.env.MP_WEBHOOK_URL,
         external_reference: result.transaction.id,
       },
     });
